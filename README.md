@@ -14,11 +14,19 @@ catkin_init_workspace
 cd ..
 ```
 Then, clone the git repository:
+```sh
 cd src
 git clone https://github.com/antoscardi/ICP_Localization.git
+```
 
-Then build your catkin workspace
+Then build your catkin workspace (-DPYTHON_EXECUTABLE=/usr/bin/python3 argument is needed if it's the first time the workspace is initialized):
+```sh
 cd ..
-catkin_make
+catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3
+source devel/setup.bash
+```
 
 Then to launch the project you just run the launch file:
+```sh
+
+```
