@@ -26,5 +26,5 @@ source devel/setup.bash
 
 Then to launch the project you just run the launch file:
 ```sh
-
+roslaunch src/ICP_Localization/launch_file.launch
 ```
