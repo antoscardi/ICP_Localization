@@ -7,15 +7,13 @@ cd ~
 mkdir ros_workspaces
 cd ros_workspaces
 mkdir ICP_localization_ws
-cd CP_localization_ws
+cd ICP_localization_ws
 mkdir src
 cd src
 catkin_init_workspace
-cd ..
 ```
 Then, clone the git repository:
 ```sh
-cd src
 git clone https://github.com/antoscardi/ICP_Localization.git
 ```
 
