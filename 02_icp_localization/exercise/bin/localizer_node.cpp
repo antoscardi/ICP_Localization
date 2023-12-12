@@ -15,6 +15,8 @@
 #include "map.h"
 #include "ros_bridge.h"
 
+using namespace std; // aggiunto da me 
+
 // Map callback definition
 void callback_map(const nav_msgs::OccupancyGridConstPtr&);
 // Initial pose callback definition
@@ -23,34 +25,34 @@ void callback_initialpose(
 // Scan callback definition
 void callback_scan(const sensor_msgs::LaserScanConstPtr&);
 
-std::shared_ptr<Map> map_ptr = nullptr;
+shared_ptr<Map> map_ptr = nullptr;  //modificato linea del prof, tolto std::
 ros::Publisher pub_scan, pub_odom;
+ros::Subscriber map_sub, init_pos_sub, base_scan_sub; // Aggiunte da me 
 
 Localizer2D localizer;
 
+
 int main(int argc, char** argv) {
-  // Initialize ROS system
-  // TODO
+  // TODO Initialize ROS system
+  ros::init(argc, argv, "localizer_node");
 
-  // Create a NodeHandle to manage the node.
+  // TODO Create a NodeHandle to manage the node.
   // The namespace of the node is set to global
-  ros::NodeHandle nh("/");
+  ros::NodeHandle nh("/node_localizer");  //VEDI SE TOGLIERE IL NOME
 
-  // Create shared pointer for the Map object
-  // TODO
+  // TODO Create shared pointer for the Map object
+  map_ptr = make_shared<Map>();
 
-  //
-  /**
-   * Subscribe to the topics:
-   * /map [nav_msgs::OccupancyGrid]
-   * /initialpose [geometry_msgs::PoseWithCovarianceStamped]
-   * /base_scan [sensor_msgs::LaserScan]
-   * and assign the correct callbacks
-   *
-   * Advertise the following topic:
-   * /odom_out [nav_msgs::Odometry]
-   */
-  // TODO
+  // TODO Subscribe to the topics and assign the correct callbacks:
+  //(nomi dei topics non cambiare per rviz)
+  // /map [nav_msgs::OccupancyGrid]
+  map_sub = nh.subscribe("/map", 10, callback_map);
+  // /initialpose [geometry_msgs::PoseWithCovarianceStamped]
+  init_pos_sub = nh.subscribe("/initialpose", 10, callback_initialpose);
+  // /base_scan [sensor_msgs::LaserScan]
+  base_scan_sub = nh.subscribe("/base_scan", 10, callback_scan);
+  // Advertise the following topic: /odom_out [nav_msgs::Odometry]
+  pub_odom = nh.advertise<nav_msgs::Odometry>("/odom_out", 10);
 
   // Scan advertiser for visualization purposes
   pub_scan = nh.advertise<sensor_msgs::LaserScan>("/scan_out", 10);
@@ -67,8 +69,8 @@ void callback_map(const nav_msgs::OccupancyGridConstPtr& msg_) {
   // If the internal map is not initialized, load the incoming occupancyGrid and
   // set the localizer map accordingly
   // Remember to load the map only once during the execution of the map.
-
   // TODO
+  //if(!(map_ptr->initialized()))
 }
 
 void callback_initialpose(
