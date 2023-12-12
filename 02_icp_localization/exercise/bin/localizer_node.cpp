@@ -70,7 +70,14 @@ void callback_map(const nav_msgs::OccupancyGridConstPtr& msg_) {
   // set the localizer map accordingly
   // Remember to load the map only once during the execution of the map.
   // TODO
-  //if(!(map_ptr->initialized()))
+  if(!(map_ptr->initialized())){
+    ROS_INFO("Initialized?: %s", map_ptr->initialized() ? "true" : "false");
+    // load the incoming occupancyGrid
+    map_ptr->loadOccupancyGrid(msg_);
+    ROS_INFO("The map has been loaded correctly. Initialized? %s", map_ptr->initialized() ? "true" : "false");
+    // set the localizer map accordingly
+    localizer.setMap(map_ptr);
+  }
 }
 
 void callback_initialpose(
@@ -82,6 +89,28 @@ void callback_initialpose(
    */
 
   // TODO
+  geometry_msgs::Pose pose_ = msg_->pose.pose;
+
+  // Print pose information
+  ROS_INFO("Received InitialPose: Posit (x=%.2f, y=%.2f z=%.2f), Orient Quatern (w=%.2f, x=%.2f, y=%.2f, z=%.2f)",
+         pose_.position.x, pose_.position.y,pose_.position.z,
+         pose_.orientation.w, pose_.orientation.x, pose_.orientation.y, pose_.orientation.z);
+  
+  //Define an Isometry Transform class to store the converted message
+  Eigen::Isometry2f iso_initial_pose;
+  //Convert pose message to Isometry
+  pose2isometry( pose_, iso_initial_pose);
+
+  // Print result of conversion
+  ROS_INFO("Converted Initial Pose to Isometry:\n%41s   | %10s\n%36.2f %2.2f %10.2f\n%36.2f %2.2f %10.2f",
+         "Rotation:", "Translation:",
+         iso_initial_pose.linear()(0, 0), iso_initial_pose.linear()(0, 1),
+         iso_initial_pose.translation()(0),
+         iso_initial_pose.linear()(1, 0), iso_initial_pose.linear()(1, 1),
+         iso_initial_pose.translation()(1));
+
+  // Add the isometry info to the localizer class
+  localizer.setInitialPose(iso_initial_pose);
 }
 
 void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
