@@ -82,23 +82,23 @@ void callback_map(const nav_msgs::OccupancyGridConstPtr& msg_) {
 
 void callback_initialpose(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr& msg_) {
-  /**
+  /** TODO (all function)
    * Convert the PoseWithCovarianceStamped message to an Eigen Isometry and
    * inform the localizer.
    * You can check ros_bridge.h for helps :)
    */
 
-  // TODO
+  // Pose info is stored in the Ptr as geometry_msgs::Pose.
   geometry_msgs::Pose pose_ = msg_->pose.pose;
 
-  // Print pose information
-  ROS_INFO("Received InitialPose: Posit (x=%.2f, y=%.2f z=%.2f), Orient Quatern (w=%.2f, x=%.2f, y=%.2f, z=%.2f)",
-         pose_.position.x, pose_.position.y,pose_.position.z,
+  // Print pose information.
+  ROS_INFO("Received InitialPose: Posit (x=%.2f, y=%.2f), Orient Quatern (w=%.2f, x=%.2f, y=%.2f, z=%.2f)",
+         pose_.position.x, pose_.position.y,
          pose_.orientation.w, pose_.orientation.x, pose_.orientation.y, pose_.orientation.z);
   
   //Define an Isometry Transform class to store the converted message
   Eigen::Isometry2f iso_initial_pose;
-  //Convert pose message to Isometry
+  //Convert the PoseWithCovarianceStamped message to an Eigen Isometry
   pose2isometry( pose_, iso_initial_pose);
 
   // Print result of conversion
@@ -109,7 +109,7 @@ void callback_initialpose(
          iso_initial_pose.linear()(1, 0), iso_initial_pose.linear()(1, 1),
          iso_initial_pose.translation()(1));
 
-  // Add the isometry info to the localizer class
+  // Inform the localizer: store info in the localizer class.
   localizer.setInitialPose(iso_initial_pose);
 }
 
