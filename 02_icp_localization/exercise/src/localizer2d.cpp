@@ -2,6 +2,8 @@
 
 #include "icp/eigen_icp_2d.h"
 
+#include <ros/ros.h> //Aggiunto da me per ROS_INFO
+
 Localizer2D::Localizer2D()
     : _map(nullptr),
       _laser_in_world(Eigen::Isometry2f::Identity()),
@@ -16,12 +18,22 @@ Localizer2D::Localizer2D()
 void Localizer2D::setMap(std::shared_ptr<Map> map_) {
   // Set the internal map pointer
   _map = map_;
-  /**
+  /** TODO
    * If the map is initialized, fill the _obst_vect vector with world
    * coordinates of all cells representing obstacles.
    * Finally instantiate the KD-Tree (obst_tree_ptr) on the vector.
    */
-  // TODO
+  if (_map->initialized()){
+    ROS_INFO("Map size: (%d,%d)", _map->size().height, _map->size().width);
+    /**
+    for (auto row = 1; row <= _map->rows(); ++row) {
+        for (auto col = 1; col <= _map->cols(); ++col) {
+          int grid_element = _map->operator()(row,col);
+          ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
+        }
+    }
+    */
+  }
 
   // Create KD-Tree
   // TODO
