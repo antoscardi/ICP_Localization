@@ -4,6 +4,8 @@
 
 #include <ros/ros.h> //Aggiunto da me per ROS_INFO
 
+using namespace std; //Aggiunto da me 
+
 Localizer2D::Localizer2D()
     : _map(nullptr),
       _laser_in_world(Eigen::Isometry2f::Identity()),
@@ -25,14 +27,20 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
    */
   if (_map->initialized()){
     ROS_INFO("Map size: (%d,%d)", _map->size().height, _map->size().width);
-    /**
+    
     for (auto row = 1; row <= _map->rows(); ++row) {
         for (auto col = 1; col <= _map->cols(); ++col) {
           int grid_element = _map->operator()(row,col);
           ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
         }
     }
-    */
+   /*
+   vector<int8_t> grid_vec = _map->grid();
+   for (int elem = 1; _map->size().height*_map->size().width; ++elem) {
+    int grid_elem_value = grid_vec[elem];
+    ROS_INFO("Value at i-th elem of vector:%d  is: %d", elem, grid_elem_value);
+   }
+   */
   }
 
   // Create KD-Tree
