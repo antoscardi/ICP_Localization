@@ -1,7 +1,7 @@
 This project uses the ICP algorithm to localize a robot inside a map.
 
 To run the package create a ROS workspace folder.
-I followed the following steps:
+In particular, follow the steps below:
 ```sh
 cd ~
 mkdir ros_workspaces

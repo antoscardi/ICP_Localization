@@ -31,7 +31,7 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
     for (auto row = 1; row <= _map->rows(); ++row) {
         for (auto col = 1; col <= _map->cols(); ++col) {
           int grid_element = _map->operator()(row,col);
-          ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
+          //ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
         }
     }
    /*
