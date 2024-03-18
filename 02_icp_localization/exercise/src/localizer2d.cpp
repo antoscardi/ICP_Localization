@@ -32,6 +32,12 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
         for (auto col = 1; col <= _map->cols(); ++col) {
           int grid_element = _map->operator()(row,col);
           //ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
+          // Converts  points in the grid map into world coordinates.
+          cv::Point2i point_in_image(row,col);
+          //ROS_INFO("Point at :%d x, and :%d y:",row, col);
+          Eigen::Vector2f point_in_world = _map->grid2world(point_in_image);
+          // Fill the obstacle vector with world coordinates of all cells representing obstacles.
+          _obst_vect.push_back(point_in_world);
         }
     }
    /*
@@ -42,9 +48,15 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
    }
    */
   }
-
-  // Create KD-Tree
-  // TODO
+  /** TODO
+   *  Create KD-Tree
+   */
+  // Create KD-Tree pointer which points the custum TreeType.
+  _obst_tree_ptr = make_shared<TreeType>(_obst_vect.begin(), _obst_vect.end());
+  // Check the pointer has been created correctly.
+  if (!_obst_tree_ptr) {
+    ROS_ERROR("Failed to construct KD-Tree of obstacles");
+    }
 }
 
 /**
@@ -53,7 +65,17 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
  * @param initial_pose_
  */
 void Localizer2D::setInitialPose(const Eigen::Isometry2f& initial_pose_) {
-  // TODO
+   /** TODO
+   * Set the current estimate for laser_in_world
+   */
+  _laser_in_world = initial_pose_;
+  // Print current estimate.
+  ROS_INFO("Localizer informed:\n%41s   | %10s\n%36.2f %2.2f %10.2f\n%36.2f %2.2f %10.2f",
+         "Rotation:", "Translation:",
+         _laser_in_world.linear()(0, 0), _laser_in_world.linear()(0, 1),
+         _laser_in_world.translation()(0),
+         _laser_in_world.linear()(1, 0), _laser_in_world.linear()(1, 1),
+         _laser_in_world.translation()(1));
 }
 
 /**
@@ -63,21 +85,20 @@ void Localizer2D::setInitialPose(const Eigen::Isometry2f& initial_pose_) {
  * @param scan_
  */
 void Localizer2D::process(const ContainerType& scan_) {
-  // Use initial pose to get a synthetic scan to compare with scan_
-  // TODO
+  ROS_INFO("Processing scan ...");
+  // TODO Use initial pose to get a synthetic scan to compare with scan_
+  
 
-  /**
+  /** TODO
    * Align prediction and scan_ using ICP.
    * Set the current estimate of laser in world as initial guess (replace the
    * solver X before running ICP)
    */
-  // TODO
 
-  /**
+  /** TODO
    * Store the solver result (X) as the new laser_in_world estimate
    *
    */
-  // TODO
 }
 
 /**
@@ -114,10 +135,9 @@ void Localizer2D::setLaserParams(float range_min_, float range_max_,
  */
 void Localizer2D::getPrediction(ContainerType& prediction_) {
   prediction_.clear();
-  /**
+  /** TODO
    * To compute the prediction, query the KD-Tree and search for all points
    * around the current laser_in_world estimate.
    * You may use additional sensor's informations to refine the prediction.
    */
-  // TODO
 }

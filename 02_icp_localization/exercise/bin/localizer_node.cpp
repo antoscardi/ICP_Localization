@@ -25,12 +25,11 @@ void callback_initialpose(
 // Scan callback definition
 void callback_scan(const sensor_msgs::LaserScanConstPtr&);
 
-shared_ptr<Map> map_ptr = nullptr;  //modificato linea del prof, tolto std::
+shared_ptr<Map> map_ptr = nullptr;  // modificato linea del prof, tolto std::
 ros::Publisher pub_scan, pub_odom;
 ros::Subscriber map_sub, init_pos_sub, base_scan_sub; // Aggiunte da me 
 
 Localizer2D localizer;
-
 
 int main(int argc, char** argv) {
   // TODO Initialize ROS system
@@ -44,7 +43,6 @@ int main(int argc, char** argv) {
   map_ptr = make_shared<Map>();
 
   // TODO Subscribe to the topics and assign the correct callbacks:
-  //(nomi dei topics non cambiare per rviz)
   // /map [nav_msgs::OccupancyGrid]
   map_sub = nh.subscribe("/map", 10, callback_map);
   // /initialpose [geometry_msgs::PoseWithCovarianceStamped]
@@ -66,10 +64,11 @@ int main(int argc, char** argv) {
 }
 
 void callback_map(const nav_msgs::OccupancyGridConstPtr& msg_) {
-  // If the internal map is not initialized, load the incoming occupancyGrid and
-  // set the localizer map accordingly
-  // Remember to load the map only once during the execution of the map.
-  // TODO
+  /** TODO
+   * If the internal map is not initialized, load the incoming occupancyGrid and
+   * set the localizer map accordingly
+   * Remember to load the map only once during the execution of the map.
+  */
   if(!(map_ptr->initialized())){
     ROS_INFO("Initialized?: %s", map_ptr->initialized() ? "true" : "false");
     // load the incoming occupancyGrid
@@ -114,19 +113,19 @@ void callback_initialpose(
 }
 
 void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
-  /**
+  ROS_INFO("Scan received ...");
+  /** TODO
    * Convert the LaserScan message into a Localizer2D::ContainerType
    * [std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>>]
    */
-  // TODO
+  
 
-  /**
+  /** TODO
    * Set the laser parameters and process the incoming scan through the
    * localizer
    */
-  // TODO
 
-  /**
+  /**  TODO
    * Send a transform message between FRAME_WORLD and FRAME_LASER.
    * The transform should contain the pose of the laser with respect to the map
    * frame.
@@ -138,15 +137,14 @@ void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
    * received message (msg_->header.stamp)
    */
   static tf2_ros::TransformBroadcaster br;
-  // TODO
+  
 
-  /**
+  /** TODO
    * Send a nav_msgs::Odometry message containing the current laser_in_world
    * transform.
    * You can use transformStamped2odometry to convert the previously computed
    * TransformStamped message to a nav_msgs::Odometry message.
    */
-  // TODO
 
   // Sends a copy of msg_ with FRAME_LASER set as frame_id
   // Used to visualize the scan attached to the current laser estimate.
