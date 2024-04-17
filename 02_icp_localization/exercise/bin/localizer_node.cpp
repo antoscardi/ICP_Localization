@@ -87,7 +87,7 @@ void callback_initialpose(
    * You can check ros_bridge.h for helps :)
    */
 
-  // Pose info is stored in the Ptr as geometry_msgs::Pose.
+  // Pose info is stored in the ptr as geometry_msgs::Pose.
   geometry_msgs::Pose pose_ = msg_->pose.pose;
 
   // Print pose information.
@@ -102,28 +102,39 @@ void callback_initialpose(
 
   // Print result of conversion
   ROS_INFO("Converted Initial Pose to Isometry:\n%41s   | %10s\n%36.2f %2.2f %10.2f\n%36.2f %2.2f %10.2f",
-         "Rotation:", "Translation:",
-         iso_initial_pose.linear()(0, 0), iso_initial_pose.linear()(0, 1),
-         iso_initial_pose.translation()(0),
-         iso_initial_pose.linear()(1, 0), iso_initial_pose.linear()(1, 1),
-         iso_initial_pose.translation()(1));
+          "Rotation:", "Translation:",
+          iso_initial_pose.linear()(0, 0), iso_initial_pose.linear()(0, 1),
+          iso_initial_pose.translation()(0),
+          iso_initial_pose.linear()(1, 0), iso_initial_pose.linear()(1, 1),
+          iso_initial_pose.translation()(1));
 
   // Inform the localizer: store info in the localizer class.
   localizer.setInitialPose(iso_initial_pose);
 }
 
 void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
-  ROS_INFO("Scan received ...");
+  // Print the laser scan to check 
+  //ROS_INFO("Scan received at time %f: min %f, max %f, angle increment %f", 
+  //         msg_->header.stamp.toSec(), msg_->range_min, msg_->range_max, msg_->angle_increment);
+
   /** TODO
    * Convert the LaserScan message into a Localizer2D::ContainerType
    * [std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>>]
    */
+  // Initialize the converted message.
+  Localizer2D::ContainerType new_scan;
+  // Convert the LaserScan message into a Localizer2D::ContainerType
+  scan2eigen(msg_, new_scan);
   
 
   /** TODO
    * Set the laser parameters and process the incoming scan through the
    * localizer
    */
+  // Set the laser parameters in the localizer
+  localizer.setLaserParams(msg_->range_min,msg_->range_max,msg_->angle_min,msg_->angle_max,msg_->angle_increment);
+  // Process the incoming scan  
+  localizer.process(new_scan);
 
   /**  TODO
    * Send a transform message between FRAME_WORLD and FRAME_LASER.
