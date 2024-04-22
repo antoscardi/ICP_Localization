@@ -29,7 +29,7 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
     ROS_INFO("Map size: (%d,%d)", _map->size().height, _map->size().width);
     
     for (auto row = 1; row <= _map->rows(); ++row) {
-        for (auto col = 1; col <= _map->cols(); ++col) {
+      for (auto col = 1; col <= _map->cols(); ++col) {
           int grid_element = _map->operator()(row,col);
           //ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
           // Converts  points in the grid map into world coordinates.
@@ -38,7 +38,7 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
           Eigen::Vector2f point_in_world = _map->grid2world(point_in_image);
           // Fill the obstacle vector with world coordinates of all cells representing obstacles.
           _obst_vect.push_back(point_in_world);
-        }
+      }
     }
    /*
    vector<int8_t> grid_vec = _map->grid();
@@ -56,7 +56,7 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
   // Check the pointer has been created correctly.
   if (!_obst_tree_ptr) {
     ROS_ERROR("Failed to construct KD-Tree of obstacles");
-    }
+  }
 }
 
 /**
@@ -85,9 +85,18 @@ void Localizer2D::setInitialPose(const Eigen::Isometry2f& initial_pose_) {
  * @param scan_
  */
 void Localizer2D::process(const ContainerType& scan_) {
-  ROS_INFO("Processing scan ...");
+  // JUST FOR DEBUBBING; TOGLIERE
+  //string scan_str = "Processing scan: ";
+  //for (const auto& point : scan_) {
+  //      scan_str += "(" + to_string(point.x()) + ", " + to_string(point.y()) + ") ";
+  //}
+  //ROS_INFO("%s", scan_str.c_str()); // Convert from c++ style to c-style string
   // TODO Use initial pose to get a synthetic scan to compare with scan_
-  
+  // Store the current prediction in a vector (container of the closest points to the current estimate)
+  ContainerType prediction;
+  getPrediction(prediction);
+  //COMPLETARE GET PREDICTION
+
 
   /** TODO
    * Align prediction and scan_ using ICP.
@@ -140,4 +149,20 @@ void Localizer2D::getPrediction(ContainerType& prediction_) {
    * around the current laser_in_world estimate.
    * You may use additional sensor's informations to refine the prediction.
    */
+  // Storing the result of the KD-Tree
+  vector <PointType*> neighbours;
+
+  // Query the KD-Tree using a full search and using as query the estimate of the position of the robot
+  static const int ball_radius = 10;
+  _obst_tree_ptr->fullSearch(neighbours, _laser_in_world.translation());
+
+  // Print the number of matches found
+  int num_matches = neighbours.size();
+  ROS_INFO("Prediction computed, Matches found: %d", num_matches);
+
+  // Convert to the ContainerType (store) because the neighbours are a vector of POINTERS
+  for (auto& pointer : neighbours) {
+    // AGGIUNGERE CONFRONTO PER RENDERE PIU PRECISA LA PREDICTION
+    prediction_.push_back(*pointer);
+    }
 }
