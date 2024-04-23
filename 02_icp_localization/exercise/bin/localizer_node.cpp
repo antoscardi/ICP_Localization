@@ -114,8 +114,8 @@ void callback_initialpose(
 
 void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
   // Print the laser scan to check 
-  //ROS_INFO("Scan received at time %f: min %f, max %f, angle increment %f", 
-  //         msg_->header.stamp.toSec(), msg_->range_min, msg_->range_max, msg_->angle_increment);
+  ROS_INFO("Scan received at time %f: min %f, max %f, angle increment %f", 
+           msg_->header.stamp.toSec(), msg_->range_min, msg_->range_max, msg_->angle_increment);
 
   /** TODO
    * Convert the LaserScan message into a Localizer2D::ContainerType
@@ -132,7 +132,7 @@ void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
    * localizer
    */
   // Set the laser parameters in the localizer
-  localizer.setLaserParams(msg_->range_min,msg_->range_max,msg_->angle_min,msg_->angle_max,msg_->angle_increment);
+  localizer.setLaserParams(msg_->range_min,msg_->range_max,msg_->angle_min,msg_->angle_max, msg_->angle_increment);
   // Process the incoming scan  
   localizer.process(new_scan);
 
@@ -147,15 +147,44 @@ void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
    * The timestamp of the message should be equal to the timestamp of the
    * received message (msg_->header.stamp)
    */
-  static tf2_ros::TransformBroadcaster br;
-  
+  // Get pose of the laser with respect to the map frame
+  Eigen::Isometry2f current_estimate = localizer.X();
+  ROS_INFO("Current estimate:\n%41s   | %10s\n%36.2f %2.2f %10.2f\n%36.2f %2.2f %10.2f",
+          "Rotation:", "Translation:",
+          current_estimate.linear()(0, 0), current_estimate.linear()(0, 1),
+          current_estimate.translation()(0),
+          current_estimate.linear()(1, 0), current_estimate.linear()(1, 1),
+          current_estimate.translation()(1));
 
+  // Initialized TransformStamped message
+  geometry_msgs::TransformStamped transformStamped_msg;
+
+  // Convert isometry to transformStamped type
+  isometry2transformStamped(current_estimate, transformStamped_msg, FRAME_WORLD, FRAME_LASER, msg_->header.stamp);
+
+  static tf2_ros::TransformBroadcaster br;
+
+   // Broadcast the transform
+  br.sendTransform(transformStamped_msg); 
+  // Print information to the console
+  ROS_INFO("Broadcasted transform from %s frame to %s frame at time %f",
+          transformStamped_msg.header.frame_id.c_str(),
+          transformStamped_msg.child_frame_id.c_str(),
+          transformStamped_msg.header.stamp.toSec());
+          
   /** TODO
    * Send a nav_msgs::Odometry message containing the current laser_in_world
    * transform.
    * You can use transformStamped2odometry to convert the previously computed
    * TransformStamped message to a nav_msgs::Odometry message.
    */
+  //
+  // Create odometry message
+  nav_msgs::Odometry odometry_msg;
+  // You can use transformStamped2odometry to convert the previously computed TransformStamped message to a nav_msgs::Odometry message.
+  transformStamped2odometry(transformStamped_msg,odometry_msg);
+  //Send a nav_msgs::Odometry message containing the current laser_in_world transform.
+  pub_odom.publish(odometry_msg);
 
   // Sends a copy of msg_ with FRAME_LASER set as frame_id
   // Used to visualize the scan attached to the current laser estimate.

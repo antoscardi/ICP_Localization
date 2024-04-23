@@ -30,14 +30,17 @@ void Localizer2D::setMap(std::shared_ptr<Map> map_) {
     
     for (auto row = 1; row <= _map->rows(); ++row) {
       for (auto col = 1; col <= _map->cols(); ++col) {
-          int grid_element = _map->operator()(row,col);
-          //ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
-          // Converts  points in the grid map into world coordinates.
-          cv::Point2i point_in_image(row,col);
-          //ROS_INFO("Point at :%d x, and :%d y:",row, col);
-          Eigen::Vector2f point_in_world = _map->grid2world(point_in_image);
-          // Fill the obstacle vector with world coordinates of all cells representing obstacles.
-          _obst_vect.push_back(point_in_world);
+        int grid_element = _map->operator()(row,col);
+        // Insert the point only if it is an obstacle
+        if (grid_element == CellType::Occupied){
+        //ROS_INFO("Value of the cell at row:%d col:%d is: %d",row, col, grid_element); 
+        // Converts  points in the grid map into world coordinates.
+        cv::Point2i point_in_image(row,col);
+        //ROS_INFO("Point at :%d x, and :%d y:",row, col);
+        Eigen::Vector2f point_in_world = _map->grid2world(point_in_image);
+        // Fill the obstacle vector with world coordinates of all cells representing obstacles.
+        _obst_vect.push_back(point_in_world);
+        }
       }
     }
    /*
@@ -95,19 +98,29 @@ void Localizer2D::process(const ContainerType& scan_) {
   // Store the current prediction in a vector (container of the closest points to the current estimate)
   ContainerType prediction;
   getPrediction(prediction);
-  //COMPLETARE GET PREDICTION
-
 
   /** TODO
    * Align prediction and scan_ using ICP.
    * Set the current estimate of laser in world as initial guess (replace the
    * solver X before running ICP)
    */
+  // Create ICP instance
+  static const int min_points_leaf = 5;
+  ICP icp(prediction, scan_, min_points_leaf);
+
+  // Set the current estimate of laser in world as initial guess
+  icp.X() = _laser_in_world;
+
+  // Run the ICP
+  static const int max_iterations = 64;
+  icp.run(max_iterations);
 
   /** TODO
    * Store the solver result (X) as the new laser_in_world estimate
    *
    */
+  // Store the solver result (X) as the new laser_in_world estimate
+  _laser_in_world = icp.X(); 
 }
 
 /**
@@ -154,15 +167,16 @@ void Localizer2D::getPrediction(ContainerType& prediction_) {
 
   // Query the KD-Tree using a full search and using as query the estimate of the position of the robot
   static const int ball_radius = 10;
-  _obst_tree_ptr->fullSearch(neighbours, _laser_in_world.translation());
+  _obst_tree_ptr->fullSearch(neighbours, _laser_in_world.translation(), ball_radius);
 
   // Print the number of matches found
   int num_matches = neighbours.size();
-  ROS_INFO("Prediction computed, Matches found: %d", num_matches);
+  //ROS_INFO("Prediction computed, Matches found: %d", num_matches);
 
   // Convert to the ContainerType (store) because the neighbours are a vector of POINTERS
   for (auto& pointer : neighbours) {
     // AGGIUNGERE CONFRONTO PER RENDERE PIU PRECISA LA PREDICTION
     prediction_.push_back(*pointer);
+    //ROS_INFO("Inside pointer [x = %f, y = %f]", (*pointer)(0), (*pointer)(1));
     }
 }
