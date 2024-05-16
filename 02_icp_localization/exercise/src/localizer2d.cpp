@@ -6,6 +6,7 @@
 
 using namespace std; //Aggiunto da me 
 
+
 Localizer2D::Localizer2D()
     : _map(nullptr),
       _laser_in_world(Eigen::Isometry2f::Identity()),
@@ -88,12 +89,6 @@ void Localizer2D::setInitialPose(const Eigen::Isometry2f& initial_pose_) {
  * @param scan_
  */
 void Localizer2D::process(const ContainerType& scan_) {
-  // JUST FOR DEBUBBING; TOGLIERE
-  //string scan_str = "Processing scan: ";
-  //for (const auto& point : scan_) {
-  //      scan_str += "(" + to_string(point.x()) + ", " + to_string(point.y()) + ") ";
-  //}
-  //ROS_INFO("%s", scan_str.c_str()); // Convert from c++ style to c-style string
   // TODO Use initial pose to get a synthetic scan to compare with scan_
   // Store the current prediction in a vector (container of the closest points to the current estimate)
   ContainerType prediction;
@@ -171,12 +166,19 @@ void Localizer2D::getPrediction(ContainerType& prediction_) {
 
   // Print the number of matches found
   int num_matches = neighbours.size();
-  //ROS_INFO("Prediction computed, Matches found: %d", num_matches);
+  ROS_INFO("Prediction computed, Matches found: %d", num_matches);
 
   // Convert to the ContainerType (store) because the neighbours are a vector of POINTERS
   for (auto& pointer : neighbours) {
     // AGGIUNGERE CONFRONTO PER RENDERE PIU PRECISA LA PREDICTION
-    prediction_.push_back(*pointer);
-    //ROS_INFO("Inside pointer [x = %f, y = %f]", (*pointer)(0), (*pointer)(1));
+    PointType v_diff = _laser_in_world.translation() - *pointer;
+    float distance = v_diff.norm();
+    float angle = atan2(v_diff.y(), v_diff.x());
+    //ROS_INFO("Distance: %.2f, Angle: %.2f", 
+    //          distance, angle);
+    if(distance <= _range_max && angle >= _angle_min && angle <= _angle_max){     
+    // Useless to put > 0 (0 is the range min) since the distance will always be positive
+     prediction_.push_back(*pointer);
     }
+  }
 }

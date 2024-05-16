@@ -114,8 +114,8 @@ void callback_initialpose(
 
 void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
   // Print the laser scan to check 
-  ROS_INFO("Scan received at time %f: min %f, max %f, angle increment %f", 
-           msg_->header.stamp.toSec(), msg_->range_min, msg_->range_max, msg_->angle_increment);
+  ROS_INFO("SCAN RECEIVED at time %.2f: min %.2f, max %.2f, angle increment %.2f, angle min %.2f , angle max %.2f", 
+           msg_->header.stamp.toSec(), msg_->range_min, msg_->range_max, msg_->angle_increment, msg_->angle_min, msg_->angle_max);
 
   /** TODO
    * Convert the LaserScan message into a Localizer2D::ContainerType
@@ -167,7 +167,7 @@ void callback_scan(const sensor_msgs::LaserScanConstPtr& msg_) {
    // Broadcast the transform
   br.sendTransform(transformStamped_msg); 
   // Print information to the console
-  ROS_INFO("Broadcasted transform from %s frame to %s frame at time %f",
+  ROS_INFO("Broadcasted transform from %s frame to %s frame at time %.2f",
           transformStamped_msg.header.frame_id.c_str(),
           transformStamped_msg.child_frame_id.c_str(),
           transformStamped_msg.header.stamp.toSec());
