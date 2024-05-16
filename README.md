@@ -2,7 +2,7 @@
 This project uses the ICP (Iterative Closest Point) algorithm in order to localize a robot inside a map, using ROS (Robot Operating System).
 
 ## Requirements
-This projects assumes you have _ROS Noetic_already installed in your machine.
+This projects assumes you have _ROS Noetic_ already installed in your machine.
 ### Map Server
 - Install the `ros-${DISTRO}-map-server` package.
    ```sh
@@ -14,8 +14,8 @@ This projects assumes you have _ROS Noetic_already installed in your machine.
   sudo apt install ros-noetic-stage-ros ros-noetic-teleop-twist-keyboard
   ```
 ## Create workspace & clone directory
-To run the package create a ROS workspace folder.
-In particular, follow the steps below:
+To run the package create a ROS workspace in your root folder.
+In particular, follow the steps below (create a folder for all ROS workspaces):
 ```sh
 cd ~
 mkdir ros_workspaces
@@ -38,7 +38,12 @@ catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3
 source devel/setup.bash
 ```
 ## Run the project 
-Then to launch the project you just run the launch file:
+Then to launch the project you only need to run the launch file:
 ```sh
 roslaunch src/ICP_Localization/launch_file.launch
 ```
+In RViz you need to set the initial pose of the robot, sufficiently close to the true one shown in the map server.
+Now, you can freely move the robot around and see it is correctly localized in the map, as shown in the example below:
+
+![icp_video-ezgif com-video-to-gif-converter](https://github.com/antoscardi/ICP_Localization/assets/99209099/19ef78f5-c92a-4e87-b9c7-131e580b07ac)
+
