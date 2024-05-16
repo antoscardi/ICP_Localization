@@ -45,4 +45,5 @@ roslaunch src/ICP_Localization/launch_file.launch
 In RViz you need to set the initial pose of the robot, sufficiently close to the true one shown in the map server.
 Now, you can freely move the robot around and see it is correctly localized in the map, as shown in the example below:
 
-![icp_video](https://github.com/antoscardi/ICP_Localization/assets/99209099/32e2e4f6-7ea4-4fe7-ba59-70a74e535b32)
+![icp_video](https://github.com/antoscardi/ICP_Localization/assets/99209099/8acb1dec-d155-4809-9284-9e0a19db9005)
+
