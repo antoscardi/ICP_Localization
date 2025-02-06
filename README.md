@@ -1,5 +1,5 @@
-# 🤖 Robot Programming Project
-This is the repository of **Robot Programming** exam, held at **La Sapienza University of Rome**, taught by **Prof. Grisetti**.
+# 🤖 Robot Localization via Iterative Closest Point
+This is the repository of **Robot Programming** exam, held at **La Sapienza University of Rome**, taught by **Prof. Giorgio Grisetti**.
 The project employs **laser scan** data processed by the **ICP (Iterative Closest Point) algorithm** to localize a robot inside a predetermined map of the environment, using **ROS (Robot Operating System)**. 🚀  
 
 ---
