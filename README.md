@@ -1,20 +1,24 @@
-# Robot Programming Project 
-This project uses the ICP (Iterative Closest Point) algorithm in order to localize a robot inside a map, using ROS (Robot Operating System).
+# 🤖 Robot Programming Project
+This is the repository of the Robot programming course project, which employs **laser scan** data processed by the **ICP (Iterative Closest Point) algorithm** to localize a robot inside a predetermined map of the environment, using **ROS (Robot Operating System)**. 🚀  
 
-## Requirements
-This projects assumes you have _ROS Noetic_ already installed in your machine.
-### Map Server
+---
+
+## 📌 Requirements  
+
+This project assumes you have **_ROS Noetic_** already installed on your machine.  
+
+### 🌏 Map Server  
 - Install the `ros-${DISTRO}-map-server` package.
    ```sh
     sudo apt install ros-noetic-map-server
    ```
-### Stage-ROS
+### 🔭 Stage-ROS & Teleop
 - Install the `ros-${DISTRO}-stage-ros` and `ros-${DISTRO}-teleop-twist-keyboard` package.
   ```sh
   sudo apt install ros-noetic-stage-ros ros-noetic-teleop-twist-keyboard
   ```
-## Create workspace & clone directory
-To run the package create a ROS workspace in your root folder.
+## 🛠️ Create Workspace & Clone Repository
+To run the package, create a **ROS workspace** in your root folder.
 In particular, follow the steps below (create a folder for all ROS workspaces):
 ```sh
 cd ~
@@ -26,26 +30,28 @@ mkdir src
 cd src
 catkin_init_workspace
 ```
-Then, clone the git repository:
+Then, **clone the GitHub repository**: 
 ```sh
 git clone https://github.com/antoscardi/ICP_Localization.git
 ```
 
-Then build your catkin workspace (-DPYTHON_EXECUTABLE=/usr/bin/python3 argument is needed only if it's the first time the workspace is initialized):
+Build your catkin workspace (**only add `-DPYTHON_EXECUTABLE=/usr/bin/python3` if it's the first time initializing the workspace**): 
 ```sh
 cd ..
 catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3
 source devel/setup.bash
 ```
-## Run the project 
-Then to launch the project you only need to run the launch file:
+## ▶️ Run the Project  
+To launch the project, simply run the launch file:
 ```sh
 roslaunch src/ICP_Localization/launch_file.launch
 ```
-In RViz you need to set the initial pose of the robot, sufficiently close to the true one shown in the map server.
-Now, you can freely move the robot around and see it is correctly localized in the map, as shown in the example below:
+In **RViz**, set the **initial pose of the robot** 📍 **close to its actual position** shown in the **map server** 🌍.
 
-https://github.com/antoscardi/ICP_Localization/assets/99209099/f877a378-42cb-42f6-b37d-ae7b5201975a
+Now, you can freely move the robot around and see it is correctly localized in the map.
+
+Example demonstration: 
+![simulation](temp.gif)
 
 
 
